@@ -62,6 +62,8 @@ const CreatePostsScreen = () => {
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
     };
+
+    
     setName("");
     setLocality("");
     setPhoto(null);

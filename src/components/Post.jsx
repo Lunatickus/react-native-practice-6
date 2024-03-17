@@ -3,7 +3,7 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { CommentsIcon } from "./CommentsIcon";
 import { MapPointIcon } from "./MapPointIcon";
 
-export const Post = ({ photo, name, location, coords }) => {
+export const Post = ({ photo, name, location, coords, comments }) => {
   const navigation = useNavigation();
 
   return (
