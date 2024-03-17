@@ -2,15 +2,16 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import PostsScreen from "./PostsScreen";
 import CreatePostsScreen from "./CreatePostsScreen";
 import ProfileScreen from "./ProfileScreen";
-import { TabBarButton } from "../components/TabBarButton";
+
 import { LogOutButton } from "../components/LogOutButton";
+import { TabBarButton } from "../components/TabBarButton";
 
 const Tabs = createBottomTabNavigator();
 
 const Home = () => {
   return (
     <Tabs.Navigator
-      initialRouteName="Profile"
+      initialRouteName="Posts"
       screenOptions={({ route }) => ({
         tabBarStyle: {
           height: 83,

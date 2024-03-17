@@ -14,6 +14,13 @@ import { useState } from "react";
 import { ImageButton } from "./ImageButton";
 import { Container } from "./Container";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { register } from "../redux/auth/authOperations";
+import {
+  selectUserAvatar,
+  selectUserError,
+  selectUserIsLoading,
+} from "../redux/auth/auth.selectors";
 
 const RegistrationScreen = () => {
   const [loginIsFocused, setLoginIsFocused] = useState(false);
@@ -23,15 +30,42 @@ const RegistrationScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const avatar = useSelector(selectUserAvatar);
+  const userError = useSelector(selectUserError);
+  const isLoading = useSelector(selectUserIsLoading);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    let errors = {};
+
+    if (!login) {
+      errors.login = "Name is required.";
+    }
+
+    if (!email) {
+      errors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      errors.email = "Email is invalid.";
+    }
+
+    if (!password) {
+      errors.password = "Password is required.";
+    } else if (password.length < 8) {
+      errors.password = "Password must be at least 8 characters.";
+    }
+
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const onRegister = () => {
-    if (!login || !email || !password) {
+    if (!validateForm()) {
       return;
     }
 
-    console.log(`Login: ${login}, Email: ${email}, Password: ${password}`);
-    navigation.navigate("Home");
+    dispatch(register({ login, email, password, avatar }));
   };
 
   return (
@@ -39,7 +73,7 @@ const RegistrationScreen = () => {
       <Background>
         <View style={styles.contentContainer}>
           <View style={styles.imageContainer}>
-            <Image />
+            {avatar && <Image style={styles.image} source={{ uri: avatar }} />}
             <ImageButton style={styles.imageButton} />
           </View>
           <Text style={styles.title}>Реєстрація</Text>
@@ -48,24 +82,30 @@ const RegistrationScreen = () => {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={100}
           >
-            <TextInput
-              placeholder="Логін"
-              style={loginIsFocused ? styles.focusedInput : styles.input}
-              onFocus={() => setLoginIsFocused(true)}
-              onBlur={() => setLoginIsFocused(false)}
-              placeholderTextColor="rgb(189, 189, 189)"
-              value={login}
-              onChangeText={setLogin}
-            />
-            <TextInput
-              placeholder="Адреса електронної пошти"
-              style={emailIsFocused ? styles.focusedInput : styles.input}
-              onFocus={() => setEmailIsFocused(true)}
-              onBlur={() => setEmailIsFocused(false)}
-              placeholderTextColor="rgb(189, 189, 189)"
-              value={email}
-              onChangeText={setEmail}
-            />
+            <View>
+              <TextInput
+                placeholder="Логін"
+                style={loginIsFocused ? styles.focusedInput : styles.input}
+                onFocus={() => setLoginIsFocused(true)}
+                onBlur={() => setLoginIsFocused(false)}
+                placeholderTextColor="rgb(189, 189, 189)"
+                value={login}
+                onChangeText={setLogin}
+              />
+              {errors.login && <Text style={styles.error}>{errors.login}</Text>}
+            </View>
+            <View>
+              <TextInput
+                placeholder="Адреса електронної пошти"
+                style={emailIsFocused ? styles.focusedInput : styles.input}
+                onFocus={() => setEmailIsFocused(true)}
+                onBlur={() => setEmailIsFocused(false)}
+                placeholderTextColor="rgb(189, 189, 189)"
+                value={email}
+                onChangeText={setEmail}
+              />
+              {errors.email && <Text style={styles.error}>{errors.email}</Text>}
+            </View>
             <View style={styles.passwordWrapper}>
               <TextInput
                 placeholder="Пароль"
@@ -77,6 +117,12 @@ const RegistrationScreen = () => {
                 value={password}
                 onChangeText={setPassword}
               />
+              {errors.password && (
+                <Text style={styles.error}>{errors.password}</Text>
+              )}
+              {userError && (
+                <Text style={styles.error}>User already exists</Text>
+              )}
               <Pressable
                 style={styles.passwordTextWrapper}
                 onPress={() => setShowPassword(!showPassword)}
@@ -85,7 +131,11 @@ const RegistrationScreen = () => {
               </Pressable>
             </View>
           </KeyboardAvoidingView>
-          <TouchableOpacity style={styles.submitButton} onPress={onRegister}>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={onRegister}
+            disabled={isLoading}
+          >
             <Text style={styles.submitButtonText}>Зареєстуватися</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
@@ -119,6 +169,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     borderRadius: 16,
   },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 16,
+  },
   imageButton: {
     position: "absolute",
     width: 25,
@@ -144,6 +199,12 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Light",
     fontSize: 16,
     lineHeight: 19,
+  },
+  error: {
+    fontFamily: "Roboto-Light",
+    fontSize: 16,
+    lineHeight: 19,
+    color: "red",
   },
   focusedInput: {
     width: "100%",

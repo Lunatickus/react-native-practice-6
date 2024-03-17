@@ -1,22 +1,27 @@
-import { useRoute } from "@react-navigation/native";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { Post } from "../components/Post";
+import { useSelector } from "react-redux";
+import {
+  selectUserAvatar,
+  selectUserEmail,
+  selectUserLogin,
+} from "../redux/auth/auth.selectors";
 
 const PostsScreen = () => {
-  const {
-    params: { name, photo, locality, coords },
-  } = useRoute();
+  const login = useSelector(selectUserLogin);
+  const email = useSelector(selectUserEmail);
+  const avatar = useSelector(selectUserAvatar);
 
   return (
     <View style={styles.container}>
       <View style={styles.imageWrapper}>
-        <Image style={styles.image} />
+        <Image style={styles.image} source={{ uri: avatar }} />
         <View style={styles.textWrapper}>
-          <Text style={styles.textLogin}>Natali Romanova</Text>
-          <Text style={styles.textEmail}>email@example.com</Text>
+          <Text style={styles.textLogin}>{login}</Text>
+          <Text style={styles.textEmail}>{email}</Text>
         </View>
       </View>
-        <Post name={name} coords={coords} photo={photo} location={locality} />
+      <Post />
     </View>
   );
 };
@@ -42,6 +47,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 16,
+    backgroundColor: "#212121CC",
   },
   textWrapper: {
     display: "flex",

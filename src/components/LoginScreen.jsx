@@ -12,6 +12,12 @@ import { Background } from "./Background";
 import { useState } from "react";
 import { Container } from "./Container";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectUserError,
+  selectUserIsLoading,
+} from "../redux/auth/auth.selectors";
+import { logIn } from "../redux/auth/authOperations";
 
 const LoginScreen = () => {
   const [emailIsFocused, setEmailIsFocused] = useState(false);
@@ -20,14 +26,36 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const [errors, setErrors] = useState({});
+  const userError = useSelector(selectUserError);
+  const isLoading = useSelector(selectUserIsLoading);
 
-  const onLogin = () => {
-    if (!email || !password) {
+  const validateForm = () => {
+    let errors = {};
+
+    if (!email) {
+      errors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      errors.email = "Email is invalid.";
+    }
+
+    if (!password) {
+      errors.password = "Password is required.";
+    } else if (password.length < 8) {
+      errors.password = "Password must be at least 8 characters.";
+    }
+
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const onLogin = async () => {
+    if (!validateForm()) {
       return;
     }
 
-    console.log(`Email: ${email}, Password: ${password}`);
-    navigation.navigate("Home");
+    dispatch(logIn({ email, password }));
   };
 
   return (
@@ -39,15 +67,18 @@ const LoginScreen = () => {
             style={styles.inputWrapper}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
           >
-            <TextInput
-              placeholder="Адреса електронної пошти"
-              style={emailIsFocused ? styles.focusedInput : styles.input}
-              onFocus={() => setEmailIsFocused(true)}
-              onBlur={() => setEmailIsFocused(false)}
-              placeholderTextColor={"rgb(189, 189, 189)"}
-              value={email}
-              onChangeText={setEmail}
-            />
+            <View>
+              <TextInput
+                placeholder="Адреса електронної пошти"
+                style={emailIsFocused ? styles.focusedInput : styles.input}
+                onFocus={() => setEmailIsFocused(true)}
+                onBlur={() => setEmailIsFocused(false)}
+                placeholderTextColor={"rgb(189, 189, 189)"}
+                value={email}
+                onChangeText={setEmail}
+              />
+              {errors.email && <Text style={styles.error}>{errors.email}</Text>}
+            </View>
             <View style={styles.passwordWrapper}>
               <TextInput
                 placeholder="Пароль"
@@ -59,6 +90,12 @@ const LoginScreen = () => {
                 value={password}
                 onChangeText={setPassword}
               />
+              {errors.password && (
+                <Text style={styles.error}>{errors.password}</Text>
+              )}
+              {userError && (
+                <Text style={styles.error}>Invalid email or password</Text>
+              )}
               <Pressable
                 style={styles.passwordTextWrapper}
                 onPress={() => setShowPassword(!showPassword)}
@@ -67,7 +104,11 @@ const LoginScreen = () => {
               </Pressable>
             </View>
           </KeyboardAvoidingView>
-          <TouchableOpacity style={styles.submitButton} onPress={onLogin}>
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={onLogin}
+            disabled={isLoading}
+          >
             <Text style={styles.submitButtonText}>Увійти</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("Registration")}>
@@ -122,6 +163,12 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Light",
     fontSize: 16,
     lineHeight: 19,
+  },
+  error: {
+    fontFamily: "Roboto-Light",
+    fontSize: 16,
+    lineHeight: 19,
+    color: "red",
   },
   inputWrapper: {
     width: "100%",

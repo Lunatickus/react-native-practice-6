@@ -3,18 +3,23 @@ import { Container } from "../components/Container";
 import { Background } from "../components/Background";
 import { ImageButton } from "../components/ImageButton";
 import { LogOutButton } from "../components/LogOutButton";
+import { useSelector } from "react-redux";
+import { selectUserAvatar, selectUserLogin } from "../redux/auth/auth.selectors";
 
 const ProfileScreen = () => {
+  const avatar = useSelector(selectUserAvatar);
+  const login = useSelector(selectUserLogin)
+
   return (
     <Container>
       <Background>
         <View style={styles.contentContainer}>
           <View style={styles.imageContainer}>
-            <Image />
+          {avatar && <Image style={styles.image} source={{ uri: avatar }} />}
             <ImageButton style={styles.imageButton} />
           </View>
           <LogOutButton styles={{ alignSelf: "flex-end", marginBottom: 46 }} />
-          <Text style={styles.title}>Natali Romanova</Text>
+          <Text style={styles.title}>{login}</Text>
         </View>
       </Background>
     </Container>
@@ -41,6 +46,11 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     backgroundColor: "#F6F6F6",
+    borderRadius: 16,
+  },
+  image: {
+    width: 120,
+    height: 120,
     borderRadius: 16,
   },
   imageButton: {

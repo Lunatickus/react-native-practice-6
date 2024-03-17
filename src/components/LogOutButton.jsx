@@ -1,9 +1,18 @@
 import { Pressable } from "react-native";
 import { Path, Rect, Svg } from "react-native-svg";
+import { useDispatch } from "react-redux";
+import { LogOut } from "../redux/auth/authOperations";
 
 export const LogOutButton = ({ styles }) => {
+  const dispatch = useDispatch();
+
   return (
-    <Pressable style={styles}>
+    <Pressable
+      style={styles}
+      onPress={() => {
+        dispatch(LogOut());
+      }}
+    >
       <Svg width="24.000000" height="24.000000" viewBox="0 0 24 24" fill="none">
         <Rect
           width="24.000000"

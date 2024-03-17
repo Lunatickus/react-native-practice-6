@@ -62,7 +62,6 @@ const CreatePostsScreen = () => {
       latitude: location.coords.latitude,
       longitude: location.coords.longitude,
     };
-    navigation.navigate("Posts", { photo, name, locality, coords });
     setName("");
     setLocality("");
     setPhoto(null);
