@@ -2,8 +2,10 @@ import { useNavigation } from "@react-navigation/native";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { CommentsIcon } from "./CommentsIcon";
 import { MapPointIcon } from "./MapPointIcon";
+import { ColoredCommentsIcon } from "./ColoredCommentsIcon";
 
-export const Post = ({ photo, name, location, coords, comments }) => {
+export const Post = ({ post }) => {
+  const { photo, name, locality, coords, comments, id } = post;
   const navigation = useNavigation();
 
   return (
@@ -13,17 +15,17 @@ export const Post = ({ photo, name, location, coords, comments }) => {
       <View style={styles.postContentWrapper}>
         <Pressable
           style={styles.postComments}
-          onPress={() => navigation.navigate("Comments")}
+          onPress={() => navigation.navigate("Comments", { photo, id })}
         >
-          <CommentsIcon />
-          <Text style={styles.postCommentsText}>0</Text>
+          {comments.length === 0 ? <CommentsIcon /> : <ColoredCommentsIcon />}
+          <Text style={styles.postCommentsText}>{comments.length}</Text>
         </Pressable>
         <Pressable
           style={styles.postComments}
-          onPress={() => navigation.navigate("Map", { coords, name, location })}
+          onPress={() => navigation.navigate("Map", { coords, name, locality })}
         >
           <MapPointIcon />
-          <Text style={styles.postLocationText}>{location}</Text>
+          <Text style={styles.postLocationText}>{locality}</Text>
         </Pressable>
       </View>
     </View>
@@ -34,6 +36,7 @@ const styles = StyleSheet.create({
   postContainer: {
     height: 300,
     width: "100%",
+    marginBottom: 32,
   },
   postImage: {
     height: 240,
@@ -56,8 +59,8 @@ const styles = StyleSheet.create({
   postComments: {
     display: "flex",
     gap: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    alignItems: "flex-end",
   },
   postCommentsText: {
     color: "#BDBDBD",

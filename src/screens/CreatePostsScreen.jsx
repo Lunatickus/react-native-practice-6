@@ -17,6 +17,8 @@ import { Container } from "../components/Container";
 import { useNavigation } from "@react-navigation/native";
 import { Camera } from "expo-camera";
 import { CameraIcon } from "../components/CameraIcon";
+import { useDispatch } from "react-redux";
+import { addPost } from "../redux/posts/postsOperations";
 
 const CreatePostsScreen = () => {
   const [name, setName] = useState("");
@@ -26,6 +28,7 @@ const CreatePostsScreen = () => {
   const [photo, setPhoto] = useState(null);
   const disabled = !name || !locality || !photo;
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const askPermission = async () => {
@@ -63,7 +66,9 @@ const CreatePostsScreen = () => {
       longitude: location.coords.longitude,
     };
 
-    
+    const post = { photo, name, locality, coords, comments: [] };
+    dispatch(addPost(post))
+    navigation.navigate("Posts");
     setName("");
     setLocality("");
     setPhoto(null);

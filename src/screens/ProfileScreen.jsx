@@ -1,34 +1,57 @@
-import { Image, StyleSheet, Text, View } from "react-native";
-import { Container } from "../components/Container";
+import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import { Background } from "../components/Background";
 import { ImageButton } from "../components/ImageButton";
 import { LogOutButton } from "../components/LogOutButton";
-import { useSelector } from "react-redux";
-import { selectUserAvatar, selectUserLogin } from "../redux/auth/auth.selectors";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectUserAvatar,
+  selectUserLogin,
+} from "../redux/auth/auth.selectors";
+import { selectPosts } from "../redux/posts/posts.selectors";
+import { fetchPosts } from "../redux/posts/postsOperations";
+import { Post } from "../components/Post";
+import { useEffect } from "react";
 
 const ProfileScreen = () => {
+  const dispatch = useDispatch();
   const avatar = useSelector(selectUserAvatar);
-  const login = useSelector(selectUserLogin)
+  const login = useSelector(selectUserLogin);
+  const posts = useSelector(selectPosts);
+  const reversedPosts = [...posts].reverse();
+
+  useEffect(() => {
+    dispatch(fetchPosts());
+  }, [dispatch]);
 
   return (
-    <Container>
+    <View style={styles.container}>
       <Background>
         <View style={styles.contentContainer}>
           <View style={styles.imageContainer}>
-          {avatar && <Image style={styles.image} source={{ uri: avatar }} />}
+            {avatar && <Image style={styles.image} source={{ uri: avatar }} />}
             <ImageButton style={styles.imageButton} />
           </View>
           <LogOutButton styles={{ alignSelf: "flex-end", marginBottom: 46 }} />
           <Text style={styles.title}>{login}</Text>
+          <FlatList
+            style={{ width: "100%" }}
+            data={reversedPosts}
+            renderItem={({ item }) => <Post post={item} />}
+            keyExtractor={(item) => item.id}
+          />
         </View>
       </Background>
-    </Container>
+    </View>
   );
 };
 
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   contentContainer: {
     position: "relative",
     alignItems: "center",
@@ -39,6 +62,7 @@ const styles = StyleSheet.create({
     paddingTop: 22,
     paddingLeft: 16,
     paddingRight: 16,
+    paddingBottom: 43,
   },
   imageContainer: {
     position: "absolute",

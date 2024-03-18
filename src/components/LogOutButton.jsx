@@ -1,4 +1,4 @@
-import { Pressable } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { Path, Rect, Svg } from "react-native-svg";
 import { useDispatch } from "react-redux";
 import { LogOut } from "../redux/auth/authOperations";
@@ -7,7 +7,7 @@ export const LogOutButton = ({ styles }) => {
   const dispatch = useDispatch();
 
   return (
-    <Pressable
+    <TouchableOpacity
       style={styles}
       onPress={() => {
         dispatch(LogOut());
@@ -45,6 +45,6 @@ export const LogOutButton = ({ styles }) => {
           stroke-linecap="round"
         />
       </Svg>
-    </Pressable>
+    </TouchableOpacity>
   );
 };

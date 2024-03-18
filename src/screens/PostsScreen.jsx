@@ -1,27 +1,45 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import { Post } from "../components/Post";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   selectUserAvatar,
   selectUserEmail,
   selectUserLogin,
 } from "../redux/auth/auth.selectors";
+import { selectPosts } from "../redux/posts/posts.selectors";
+import { useEffect } from "react";
+import { fetchPosts } from "../redux/posts/postsOperations";
 
 const PostsScreen = () => {
+  const dispatch = useDispatch();
   const login = useSelector(selectUserLogin);
   const email = useSelector(selectUserEmail);
   const avatar = useSelector(selectUserAvatar);
+  const posts = useSelector(selectPosts);
+  const reversedPosts = [...posts].reverse();
+
+  useEffect(() => {
+    dispatch(fetchPosts());
+  }, [dispatch]);
 
   return (
     <View style={styles.container}>
       <View style={styles.imageWrapper}>
-        <Image style={styles.image} source={{ uri: avatar }} />
+        {avatar ? (
+          <Image style={styles.image} source={{ uri: avatar }} />
+        ) : (
+          <View style={styles.image} />
+        )}
         <View style={styles.textWrapper}>
           <Text style={styles.textLogin}>{login}</Text>
           <Text style={styles.textEmail}>{email}</Text>
         </View>
       </View>
-      <Post />
+      <FlatList
+        data={reversedPosts}
+        renderItem={({ item }) => <Post post={item} />}
+        keyExtractor={(item) => item.id}
+      />
     </View>
   );
 };
@@ -52,6 +70,7 @@ const styles = StyleSheet.create({
   textWrapper: {
     display: "flex",
     justifyContent: "center",
+    marginBottom: 32,
   },
   textLogin: {
     color: "#212121",

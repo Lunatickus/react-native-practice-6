@@ -52,7 +52,8 @@ export const getCurrentUser = async () => {
     const displayName = user.displayName;
     const email = user.email;
     const photoURL = user.photoURL;
-    return { displayName, email, photoURL };
+    const uid = user.uid;
+    return { displayName, email, photoURL, uid };
   }
 
   return;
